@@ -1,0 +1,31 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*"%>
+<%
+	if(session.getAttribute("loginId")==null){
+		response.sendRedirect("./index.jsp");
+		return;
+	}
+
+	if(request.getParameter("guestbookNo")==null){
+		response.sendRedirect("./guest.jsp");
+		return;
+	}
+
+	int guestbookNo = Integer.parseInt(request.getParameter("guestbookNo"));
+	
+	Class.forName("org.mariadb.jdbc.Driver");
+	String url = "jdbc:mariadb://localhost:3306/blog";
+	String dbuser = "root";
+	String dbpw = "1234";
+	Connection conn = DriverManager.getConnection(url, dbuser, dbpw);
+	
+	// 메뉴 목록
+	String sql = "DELETE FROM guestbook WHERE guestbook_no = ? and id = ?";
+	PreparedStatement stmt = conn.prepareStatement(sql);
+	stmt.setInt(1, guestbookNo);
+	stmt.setString(2,(String)session.getAttribute("loginId")); //Objct, 다형성, 형변환, Map
+	
+	int row = stmt.executeUpdate();
+	
+	response.sendRedirect("./guest.jsp");
+%>
